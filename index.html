@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+
+  <title>Consignment Inventory Confirmation · Retrouvaí</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1450px;
+      margin: 0 auto;
+      padding: 35px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #557a67;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      color: #557a67;
+      font-family: Georgia, serif;
+      font-size: 38px;
+      letter-spacing: 1px;
+    }
+
+    .title {
+      color: #557a67;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .customer-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      font-size: 16px;
+    }
+
+    .customer {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .inventory-summary {
+      width: 290px;
+      max-width: 100%;
+      margin-bottom: 24px;
+      border: 1px solid #9bb3a1;
+      background: white;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      font-size: 14px;
+    }
+
+    .summary-row + .summary-row {
+      border-top: 1px solid #9bb3a1;
+    }
+
+    .summary-row span {
+      color: #333;
+    }
+
+    .summary-row strong {
+      font-weight: 600;
+    }
+
+    .instructions {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 18px 20px;
+      margin-bottom: 25px;
+      border-radius: 5px;
+      line-height: 1.55;
+    }
+
+    .instructions p {
+      margin: 0 0 7px 0;
+    }
+
+    .instructions p:last-child {
+      margin-bottom: 0;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th {
+      background: #dfe9e2;
+      padding: 10px;
+      border: 1px solid #8cab98;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid #b8cbbb;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .picture {
+      width: 80px;
+      text-align: center;
+    }
+
+    .picture img {
+      max-width: 65px;
+      max-height: 65px;
+      object-fit: contain;
+      transition: transform 0.15s ease;
+    }
+
+    .picture img.loaded {
+      cursor: zoom-in;
+    }
+
+    .picture img.loaded:hover {
+      transform: scale(1.05);
+    }
+
+    .picture img:not([src]) {
+      width: 65px;
+      height: 65px;
+      background: #eef2ef;
+      border-radius: 3px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .status {
+      min-width: 220px;
+    }
+
+    .status-option {
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    input[type="radio"] {
+      transform: scale(1.15);
+      margin-right: 6px;
+    }
+
+    input[type="date"] {
+      padding: 7px;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      width: 145px;
+      font-family: inherit;
+    }
+
+    input[type="date"]:disabled {
+      background: #eee;
+      opacity: 0.6;
+    }
+
+    .date-cell {
+      min-width: 165px;
+      text-align: center;
+    }
+
+    .actions {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    button {
+      background: #557a67;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 14px 35px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .error {
+      display: none;
+      margin-top: 18px;
+      background: #fff0f0;
+      border: 1px solid #dca7a7;
+      color: #8b2929;
+      padding: 12px;
+      border-radius: 4px;
+    }
+
+    .message-page {
+      text-align: center;
+      max-width: 650px;
+      margin: 80px auto;
+      padding: 60px 20px;
+    }
+
+    .message-brand {
+      color: #557a67;
+      font-family: Georgia, serif;
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+
+    .message-page h2 {
+      color: #557a67;
+      font-weight: 500;
+    }
+
+    .message-page p {
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .message-page .note {
+      color: #777;
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 34px;
+      height: 34px;
+      margin: 10px auto 18px;
+      border: 3px solid #dfe9e2;
+      border-top-color: #557a67;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .required {
+      color: #777;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .view {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+
+      .container {
+        padding: 15px;
+      }
+
+      .header {
+        display: block;
+      }
+
+      .brand {
+        font-size: 30px;
+      }
+
+      .title {
+        margin-top: 10px;
+        font-size: 19px;
+      }
+
+      .customer-row {
+        display: block;
+      }
+
+      .customer-row > div:last-child {
+        margin-top: 8px;
+      }
+    }
+
+
+    /* IMAGE POP-UP */
+
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.72);
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .image-modal-content {
+      position: relative;
+      background: white;
+      padding: 18px;
+      border-radius: 6px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-modal-content img {
+      max-width: 85vw;
+      max-height: 82vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #557a67;
+      color: white;
+      font-size: 24px;
+      line-height: 31px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .image-modal-close:hover {
+      background: #456653;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<!-- LOADING -->
+
+<div id="loadingView" class="view message-page" style="display:block;">
+
+  <div class="message-brand">RETROUVAÍ</div>
+
+  <div class="spinner"></div>
+
+  <p>Loading your consignment inventory…</p>
+
+</div>
+
+
+<!-- MESSAGE (invalid link, already confirmed, errors) -->
+
+<div id="messageView" class="view message-page">
+
+  <div class="message-brand">RETROUVAÍ</div>
+
+  <h2 id="messageTitle"></h2>
+
+  <p id="messageText"></p>
+
+  <p id="messageNote" class="note"></p>
+
+</div>
+
+
+<!-- FORM -->
+
+<div id="formView" class="view container">
+
+  <div class="header">
+
+    <div class="brand">RETROUVAÍ</div>
+
+    <div class="title">Consignment Inventory Confirmation</div>
+
+  </div>
+
+
+  <div class="customer-row">
+
+    <div id="clientName" class="customer"></div>
+
+    <div>
+      <strong>Date of Report:</strong>
+      <span id="reportDate"></span>
+    </div>
+
+  </div>
+
+
+  <div class="inventory-summary">
+
+    <div class="summary-row">
+      <span>Total pieces per our records:</span>
+      <strong id="totalItems"></strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Total inventory value:</span>
+      <strong id="totalValue"></strong>
+    </div>
+
+  </div>
+
+
+  <div class="instructions">
+
+    <p>Please review each item below and select its current status.</p>
+
+    <p><strong>A status is required for every item.</strong></p>
+
+    <p>If an item has been <strong>sold</strong>, please provide the corresponding sale date.</p>
+
+    <p>If an item has been <strong>returned to Retrouvai</strong>, please provide the corresponding return date.</p>
+
+  </div>
+
+
+  <div class="table-wrapper">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Style / SKU</th>
+          <th>Picture</th>
+          <th>Item Description</th>
+          <th>Size</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Order #</th>
+          <th>Date Sent</th>
+          <th>Current Status *</th>
+          <th>Sale Date</th>
+          <th>Return Date</th>
+        </tr>
+      </thead>
+
+      <tbody id="itemsBody"></tbody>
+
+    </table>
+
+  </div>
+
+
+  <div class="required">* Required</div>
+
+  <div id="errorBox" class="error"></div>
+
+  <div class="actions">
+    <button id="submitButton" type="button">Confirm Inventory</button>
+  </div>
+
+</div>
+
+
+<!-- SUCCESS -->
+
+<div id="successView" class="view message-page">
+
+  <div class="message-brand">RETROUVAÍ</div>
+
+  <h2>Thank you!</h2>
+
+  <p>
+    Your consignment inventory confirmation
+    has been successfully submitted to Retrouvai.
+  </p>
+
+</div>
+
+
+<!-- IMAGE MODAL -->
+
+<div id="imageModal" class="image-modal">
+
+  <div class="image-modal-content">
+
+    <div id="imageModalClose" class="image-modal-close">&times;</div>
+
+    <img id="modalImage" alt="Product Image">
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /* ========================================================
+     CONFIG
+
+     URL of the Apps Script web app (Implementar → Gestionar
+     implementaciones → URL de la app web). Must end in /exec
+     and must NOT contain /a/macros/... or /u/1/.
+  ======================================================== */
+
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbz06oOEkONZ98KDVxYe8Nbns0c0ncYW43bcD3mN_XqNxK1jRq6DjH52ehM7n4pMlYY9/exec';
+
+
+  /* ========================================================
+     STATE
+  ======================================================== */
+
+  const params = new URLSearchParams(window.location.search);
+
+  const SHEET_ID = params.get('sid');
+  const TOKEN = params.get('token');
+
+  let ITEMS = [];
+
+
+  /* ========================================================
+     API
+
+     credentials: 'omit' is the key part: the browser does NOT
+     send the visitor's Google cookies, so Google never tries
+     to pick an account (/u/1/) and the multi-account error
+     cannot happen.
+  ======================================================== */
+
+  async function apiGet(query) {
+
+    const url =
+      API_URL + '?' + new URLSearchParams(query).toString();
+
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'omit',
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
+    }
+
+    return response.json();
+  }
+
+
+  async function apiPost(body) {
+
+    /*
+     * Sent as text/plain (default for a string body) so the
+     * browser does not need a CORS preflight, which Apps
+     * Script does not support.
+     */
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      credentials: 'omit',
+      redirect: 'follow',
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
+    }
+
+    return response.json();
+  }
+
+
+  /* ========================================================
+     VIEWS
+  ======================================================== */
+
+  function showView(id) {
+
+    ['loadingView', 'messageView', 'formView', 'successView']
+      .forEach(view => {
+        document.getElementById(view).style.display =
+          view === id ? 'block' : 'none';
+      });
+
+    window.scrollTo(0, 0);
+  }
+
+
+  function showMessage(title, text, note) {
+
+    document.getElementById('messageTitle').textContent = title || '';
+    document.getElementById('messageText').textContent = text || '';
+    document.getElementById('messageNote').textContent = note || '';
+
+    showView('messageView');
+  }
+
+
+  function setText(id, value) {
+
+    document.getElementById(id).textContent =
+      value === null || value === undefined ? '' : String(value);
+  }
+
+
+  /* ========================================================
+     INIT
+  ======================================================== */
+
+  async function init() {
+
+    if (!SHEET_ID || !TOKEN) {
+
+      showMessage(
+        'Invalid link',
+        'This link is incomplete. Please use the full link from the email we sent you.'
+      );
+
+      return;
+    }
+
+
+    try {
+
+      const result = await apiGet({
+        action: 'inventory',
+        sid: SHEET_ID,
+        token: TOKEN
+      });
+
+
+      if (!result.ok) {
+
+        if (result.code === 'used') {
+
+          showMessage(
+            'Inventory Already Confirmed',
+            'Thank you. The consignment inventory confirmation for ' +
+              (result.client || 'your store') +
+              ' has already been submitted.',
+            'If Retrouvai requires a new inventory confirmation, a new link will be provided.'
+          );
+
+          return;
+        }
+
+
+        showMessage(
+          'Unable to open this link',
+          result.message || 'This confirmation link is no longer valid.',
+          'If you think this is a mistake, please reach out to Retrouvai.'
+        );
+
+        return;
+      }
+
+
+      renderForm(result.data);
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        'Something went wrong',
+        'We could not load your inventory. Please check your internet connection and reload the page.',
+        'If the problem continues, please reach out to Retrouvai.'
+      );
+    }
+  }
+
+
+  /* ========================================================
+     RENDER
+  ======================================================== */
+
+  function renderForm(data) {
+
+    ITEMS = data.items || [];
+
+    setText('clientName', data.client);
+    setText('reportDate', data.reportDate);
+    setText('totalItems', data.totalItems);
+    setText('totalValue', data.totalStockValue);
+
+
+    const tbody = document.getElementById('itemsBody');
+    tbody.innerHTML = '';
+
+    const today = todayIso();
+
+    ITEMS.forEach((item, index) => {
+      tbody.appendChild(buildRow(item, index, today));
+    });
+
+
+    showView('formView');
+
+    loadImages();
+  }
+
+
+  function textCell(value, className) {
+
+    const td = document.createElement('td');
+
+    if (className) {
+      td.className = className;
+    }
+
+    td.textContent =
+      value === null || value === undefined ? '' : String(value);
+
+    return td;
+  }
+
+
+  function dateCell(id, max) {
+
+    const td = document.createElement('td');
+    td.className = 'date-cell';
+
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.id = id;
+    input.disabled = true;
+    input.max = max;
+
+    td.appendChild(input);
+
+    return td;
+  }
+
+
+  function buildRow(item, index, today) {
+
+    const tr = document.createElement('tr');
+    tr.dataset.row = item.row;
+
+
+    tr.appendChild(textCell(item.sku, 'center'));
+
+
+    const pictureCell = document.createElement('td');
+    pictureCell.className = 'picture';
+
+    if (item.hasPicture) {
+
+      const img = document.createElement('img');
+      img.className = 'product-image';
+      img.alt = item.sku || '';
+      img.dataset.row = item.row;
+
+      pictureCell.appendChild(img);
+    }
+
+    tr.appendChild(pictureCell);
+
+
+    tr.appendChild(textCell(item.description));
+    tr.appendChild(textCell(item.size, 'center'));
+    tr.appendChild(textCell(item.qty, 'center'));
+    tr.appendChild(textCell(item.price, 'center'));
+    tr.appendChild(textCell(item.order, 'center'));
+    tr.appendChild(textCell(item.dateSent, 'center'));
+
+
+    const statusCell = document.createElement('td');
+    statusCell.className = 'status';
+
+    [
+      ['stock', 'In Stock'],
+      ['sold', 'Sold'],
+      ['returned', 'Returned']
+    ].forEach(([value, label]) => {
+
+      const labelEl = document.createElement('label');
+      labelEl.className = 'status-option';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'status_' + index;
+      radio.value = value;
+      radio.addEventListener('change', () => statusChanged(index));
+
+      labelEl.appendChild(radio);
+      labelEl.appendChild(document.createTextNode(label));
+
+      statusCell.appendChild(labelEl);
+    });
+
+    tr.appendChild(statusCell);
+
+
+    tr.appendChild(dateCell('saleDate_' + index, today));
+    tr.appendChild(dateCell('returnDate_' + index, today));
+
+    return tr;
+  }
+
+
+  function todayIso() {
+
+    const d = new Date();
+
+    return (
+      d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0')
+    );
+  }
+
+
+  /* ========================================================
+     STATUS CHANGED
+  ======================================================== */
+
+  function statusChanged(index) {
+
+    const selected = document.querySelector(
+      'input[name="status_' + index + '"]:checked'
+    );
+
+    const saleDate = document.getElementById('saleDate_' + index);
+    const returnDate = document.getElementById('returnDate_' + index);
+
+    saleDate.disabled = true;
+    returnDate.disabled = true;
+
+    if (!selected) {
+      return;
+    }
+
+    if (selected.value === 'sold') {
+      saleDate.disabled = false;
+      returnDate.value = '';
+      return;
+    }
+
+    if (selected.value === 'returned') {
+      returnDate.disabled = false;
+      saleDate.value = '';
+      return;
+    }
+
+    saleDate.value = '';
+    returnDate.value = '';
+  }
+
+
+  /* ========================================================
+     SUBMIT
+  ======================================================== */
+
+  async function submitForm() {
+
+    hideError();
+
+    const responses = [];
+    const rows = document.querySelectorAll('#itemsBody tr');
+
+
+    for (let index = 0; index < ITEMS.length; index++) {
+
+      const row = rows[index].dataset.row;
+
+      const selected = document.querySelector(
+        'input[name="status_' + index + '"]:checked'
+      );
+
+      if (!selected) {
+        showError('Please select In Stock, Sold, or Returned for every item before submitting.');
+        return;
+      }
+
+      const saleDate = document.getElementById('saleDate_' + index).value;
+      const returnDate = document.getElementById('returnDate_' + index).value;
+
+      if (selected.value === 'sold' && !saleDate) {
+        showError('Please enter the sale date for every item marked as Sold.');
+        return;
+      }
+
+      if (selected.value === 'returned' && !returnDate) {
+        showError('Please enter the return date for every item marked as Returned.');
+        return;
+      }
+
+      responses.push({
+        row: row,
+        status: selected.value,
+        saleDate: saleDate,
+        returnDate: returnDate
+      });
+    }
+
+
+    const button = document.getElementById('submitButton');
+
+    button.disabled = true;
+    button.innerText = 'Submitting...';
+
+
+    try {
+
+      const result = await apiPost({
+        sheetId: SHEET_ID,
+        token: TOKEN,
+        responses: responses
+      });
+
+      if (!result.ok) {
+        throw new Error(result.message || 'Unable to submit confirmation.');
+      }
+
+      showView('successView');
+
+    } catch (error) {
+
+      console.error(error);
+
+      button.disabled = false;
+      button.innerText = 'Confirm Inventory';
+
+      showError(
+        error instanceof TypeError
+          ? 'Unable to submit confirmation. Please check your internet connection and try again.'
+          : (error.message || 'Unable to submit confirmation.')
+      );
+    }
+  }
+
+
+  /* ========================================================
+     ERROR
+  ======================================================== */
+
+  function showError(message) {
+
+    const box = document.getElementById('errorBox');
+
+    box.textContent = message;
+    box.style.display = 'block';
+
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+
+  function hideError() {
+    document.getElementById('errorBox').style.display = 'none';
+  }
+
+
+  /* ========================================================
+     PRODUCT IMAGES
+     Loaded 4 at a time so we don't flood Apps Script.
+  ======================================================== */
+
+  async function loadImages() {
+
+    const images = Array.from(document.querySelectorAll('.product-image'));
+    let next = 0;
+
+
+    async function worker() {
+
+      while (next < images.length) {
+
+        const img = images[next++];
+
+        try {
+
+          const result = await apiGet({
+            action: 'image',
+            sid: SHEET_ID,
+            token: TOKEN,
+            row: img.dataset.row
+          });
+
+          if (result.ok && result.src) {
+
+            img.src = result.src;
+            img.classList.add('loaded');
+            img.addEventListener('click', () => openImageModal(result.src));
+
+          } else {
+
+            img.remove();
+          }
+
+        } catch (error) {
+
+          console.error(error);
+          img.remove();
+        }
+      }
+    }
+
+
+    const workers = [];
+
+    for (let i = 0; i < Math.min(4, images.length); i++) {
+      workers.push(worker());
+    }
+
+    await Promise.all(workers);
+  }
+
+
+  /* ========================================================
+     IMAGE MODAL
+  ======================================================== */
+
+  function openImageModal(src) {
+
+    document.getElementById('modalImage').src = src;
+    document.getElementById('imageModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+
+  function closeImageModal() {
+
+    document.getElementById('imageModal').style.display = 'none';
+    document.getElementById('modalImage').removeAttribute('src');
+    document.body.style.overflow = '';
+  }
+
+
+  document.getElementById('imageModal').addEventListener('click', event => {
+    if (event.target.id === 'imageModal') {
+      closeImageModal();
+    }
+  });
+
+  document.getElementById('imageModalClose').addEventListener('click', closeImageModal);
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      closeImageModal();
+    }
+  });
+
+  document.getElementById('submitButton').addEventListener('click', submitForm);
+
+
+  init();
+
+</script>
+
+</body>
+
+</html>
